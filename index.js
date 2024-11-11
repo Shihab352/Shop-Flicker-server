@@ -1,4 +1,4 @@
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 const express = require('express')
 const cors = require('cors')
@@ -40,6 +40,22 @@ async function run() {
 
     app.get('/jobs', async(req, res)=>{
       const result = await jobsCollection.find().toArray();
+      res.send(result);
+    })
+
+    // Get single data from db using job id 
+    app.get('/job/:id' , async(req ,res)=>{
+      const id = req.params.id
+      console.log(id);
+      const query = {_id : new ObjectId(id)}
+      const result = await jobsCollection.findOne(query);
+      res.send(result);
+    })
+
+    // Sava a bid data in db 
+    app.post('/bid' , async (req,res)=>{
+      const bidData = req.body;
+      const result = await bidsCollection.insertOne(bidData);
       res.send(result);
     })
    
