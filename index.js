@@ -58,7 +58,47 @@ async function run() {
       const result = await bidsCollection.insertOne(bidData);
       res.send(result);
     })
-   
+
+    // Sava a job data in db 
+    app.post('/job' , async (req,res)=>{
+      const jobData = req.body;
+      const result = await jobsCollection.insertOne(jobData);
+      res.send(result);
+    })
+
+    // Get all jobs posted by e specific user 
+
+    app.get("/jobs/:email", async (req,res)=>{
+      const email = req.params.email
+      const query = {'buyer.email' : email}
+      const result = await jobsCollection.find(query).toArray()
+      res.send(result)
+    })
+    
+    // delete e job data from db 
+    app.delete("/jobs/:id", async (req,res)=>{
+      const id = req.params.id
+      const query = {_id : new ObjectId(id)}
+      const result = await jobsCollection.deleteOne(query)
+      res.send(result)
+    })
+
+    // Update a job in db
+    app.put('/jobs/:id', async (req,res)=>{
+      const id = req.params.id
+      const jobData = req.body
+      const query = {_id : new ObjectId(id)}
+      const options = {upsert : true}
+      const updateDoc = {
+        $set : {
+          ...jobData,
+        }
+      }
+      const result = await jobsCollection.updateOne(query,updateDoc,options)
+      res.send(result)
+      
+    })
+    
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
